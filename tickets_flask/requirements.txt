@@ -1,8 +1,0 @@
-Flask
-Flask-Login
-Flask-WTF
-Flask-Migrate
-Flask-SQLAlchemy
-email-validator
-Werkzeug
-python-dotenv

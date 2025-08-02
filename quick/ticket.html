@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ticket Details - QuickDesk</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+  <div class="max-w-3xl mx-auto py-10">
+    <h2 class="text-2xl font-bold mb-6">Ticket Details</h2>
+    <div class="bg-white p-6 rounded shadow">
+      <h3 id="ticketSubject" class="text-xl font-semibold mb-2"></h3>
+      <p id="ticketDescription" class="mb-2 text-gray-700"></p>
+      <p id="ticketCategory" class="mb-2 text-sm text-blue-600"></p>
+      <p>Status: <span id="ticketStatus" class="font-semibold"></span></p>
+      <div id="ticketThread" class="my-4 border-t pt-4 space-y-4"></div>
+
+      <textarea id="replyBox" class="w-full p-2 border rounded mb-2" placeholder="Type your reply..."></textarea>
+      <button onclick="addReply()" class="bg-green-600 text-white px-4 py-2 rounded">Send Reply</button>
+      <button onclick="closeTicket()" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded">Close Ticket</button>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const ticketId = urlParams.get('id');
+
+    const tickets = JSON.parse(localStorage.getItem('tickets')) || [];
+    const ticket = tickets.find(t => t.id === ticketId);
+
+    if (!ticket) {
+      alert('Ticket not found');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('ticketSubject').textContent = ticket.subject;
+    document.getElementById('ticketDescription').textContent = ticket.description;
+    document.getElementById('ticketCategory').textContent = 'Category: ' + ticket.category;
+    document.getElementById('ticketStatus').textContent = ticket.status;
+
+    const threadDiv = document.getElementById('ticketThread');
+    ticket.thread.forEach(msg => {
+      const msgBox = document.createElement('div');
+      msgBox.className = 'bg-gray-100 p-3 rounded';
+      msgBox.innerHTML = `<strong>${msg.by}:</strong> ${msg.message}`;
+      threadDiv.appendChild(msgBox);
+    });
+
+    function addReply() {
+      const replyText = document.getElementById('replyBox').value.trim();
+      if (!replyText) return alert("Reply can't be empty.");
+      ticket.thread.push({ by: 'You', message: replyText });
+      ticket.status = 'In Progress';
+      localStorage.setItem('tickets', JSON.stringify(tickets));
+      location.reload();
+    }
+
+    function closeTicket() {
+      ticket.status = 'Closed';
+      localStorage.setItem('tickets', JSON.stringify(tickets));
+      alert('Ticket closed successfully');
+      location.reload();
+    }
+  </script>
+</body>
+</html>
